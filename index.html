@@ -1,62 +1,83 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>WANDERING OLDMAN AIS</title>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,shrink-to-fit=no">
-<link rel="stylesheet" href="/clap.css">
-<!-- Clappr core -->
-<script src="https://cdn.jsdelivr.net/npm/@clappr/player@0.4.0/dist/clappr.min.js"></script>
-<!-- Plugins -->
-<script src="https://cdn.jsdelivr.net/npm/mux.js@5.6.7/dist/mux.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/level-selector@latest/dist/level-selector.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/clappr-chromecast-plugin@latest/dist/clappr-chromecast-plugin.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/clappr-pip@latest/dist/clappr-pip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/clappr-playback-rate-plugin@latest/dist/clappr-playback-rate-plugin.min.js"></script>
-<style>
-    body {
-        background-color: #000;
-        margin: 0;
-        padding: 0;
-    }
-    #player {
-        width: 100%;
-        height: 100vh;
-    }
-    .watermark {
-        position: absolute;
-        bottom: 10px;
-        right: 20px;
-        font-size: 15px;
-        font-weight: bold;
-        color: #ff0;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>WANDERING OLDMAN AIS</title>
+    <!-- Responsive meta tag for proper mobile scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Tailwind CSS for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* This style block ensures the body and player div take up the full viewport */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        #player {
+            width: 100%;
+            height: 100vh; /* Make the player fill the entire viewport height */
+        }
+        /* Custom styling for the watermark for better visibility and aesthetics */
+        .watermark {
+            position: absolute;
+            bottom: 24px; /* A bit more padding from the bottom */
+            right: 24px; /* A bit more padding from the right */
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff; /* White text for better contrast */
+            text-shadow: 1px 1px 2px #000; /* Subtle text shadow for readability */
+            font-family: 'Inter', sans-serif;
+            background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent background */
+            padding: 8px 12px;
+            border-radius: 8px; /* Rounded corners */
+        }
+    </style>
+    <!-- Clappr core -->
+    <script src="https://cdn.jsdelivr.net/npm/@clappr/player@0.4.0/dist/clappr.min.js"></script>
+    <!-- Plugins: LevelSelector for switching video quality -->
+    <script src="https://cdn.jsdelivr.net/npm/level-selector@latest/dist/level-selector.min.js"></script>
 </head>
-<body>
-<div id="player"></div>
-<div class="watermark"><em>แฟมิลี่ทีวี</em></div>
-<center><p><ins>แฟมิลี่ทีวี</ins></p></center>
-<script>
-    var player = new Clappr.Player({
-        source: 'http://49.0.64.96:8007/IZAA', // ลิงก์ใหม่
-        mimeType: 'application/x-mpegURL', // สำหรับ HLS
-        autoPlay: true,
-        height: '100%',
-        width: '100%',
-        plugins: [LevelSelector, Clappr.MediaControl],
-        events: {
-            onReady: function () {
-                var plugin = this.getPlugin('click_to_pause');
-                if (plugin) plugin.disable();
-            }
-        },
-        chromecast: {
-            preload: 'metadata',
-            contentType: 'application/x-mpegURL'
-        },
-        parentId: '#player'
-    });
-</script>
+<body class="bg-black font-sans">
+    <!-- The container for our Clappr player -->
+    <div id="player"></div>
+    <!-- The watermark element, now with a cleaner look -->
+    <div class="watermark"><em>แฟมิลี่ทีวี</em></div>
+    
+    <script>
+        // Use a self-invoking function to avoid global variables
+        (function() {
+            // Get the player container element
+            const playerElement = document.getElementById('player');
+            // Wait for the DOM to be fully loaded before initializing the player
+            if (playerElement) {
+                // Initialize the Clappr player
+                const player = new Clappr.Player({
+                    // This is a sample HLS stream URL. Replace it with your actual stream link.
+                    source: 'https://live1.thaitvstream.com/play/siamnewstv/index.m3u8',
+                    mimeType: 'application/x-mpegURL', // Mime type for HLS streams
+                    autoPlay: true, // Start playing automatically
+                    height: '100%',
+                    width: '100%',
+                    plugins: [
+                        LevelSelector // Plugin to allow users to change video quality
+                    ],
+                    parentId: '#player', // The ID of the div where the player will be rendered
+                    mediaControl: {
+                        seek: true, // Enable seeking in the media control
+                        buttons: [
+                            'play', 'pause', 'stop', 'volume', 'fullscreen', 'level-selector'
+                        ]
+                    }
+                });
+                // An optional event listener to log when the player is ready
+                player.on(Clappr.Events.PLAYER_PLAY, function() {
+                    console.log('Player has started playing.');
+                });
+            } else {
+                console.error('Player element with ID "player" not found.');
+            }
+        })();
+    </script>
 </body>
 </html>
