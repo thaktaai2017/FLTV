@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>แฟมิลี่ทีวี</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { background-color: #000; margin: 0; padding: 0; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/clappr-level-selector@latest/dist/level-selector.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/clappr-pip@latest/dist/clappr-pip.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/clappr-playback-rate-plugin@latest/dist/clappr-playback-rate-plugin.min.js"></script>
+</head>
+<body>
+<div id="player"></div>
+<script>
+var player = new Clappr.Player({
+    source: 'http://49.0.64.96:8007/SERIES', // ใส่ลิงก์ HLS
+    height: '100%',
+    width: '100%',
+    autoPlay: true,
+    disableClickToPause: true,
+    plugins: [
+        LevelSelector,
+        ClapprPip.PipButton,
+        ClapprPlaybackRatePlugin
+    ],
+    parentId: '#player'
+});
+</script>
+<span style="position:absolute;bottom:10px;right:20px;font-size:15px;font-weight:bold;color:#ff0;">
+    <em>แฟมิลี่ทีวี</em>
+</span>
+<center><p><ins>แฟมิลี่ทีวี</ins></p></center>
+</body>
+</html>
