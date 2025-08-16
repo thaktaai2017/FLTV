@@ -1,45 +1,130 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Stream Player</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- โหลด Video.js -->
-  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-  <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-  <style>
-    body {
-      background-color: #000;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .video-js {
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-      max-height: 100%;
-    }
-  </style>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Live from earth. Powered by datarhei Restreamer.">
+	<meta name="author" content="datarhei restreamer">
+	<title>#</title>
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+	<link rel="alternate" type="application/json+oembed" href="channels/79d12b37-3f44-4bc1-95a8-3958a4a66b44/oembed.json" title="#">
+	<link rel="alternate" type="text/xml+oembed" href="channels/79d12b37-3f44-4bc1-95a8-3958a4a66b44/oembed.xml" title="#">
+	<script src="channels/79d12b37-3f44-4bc1-95a8-3958a4a66b44/config.js"></script>
+	<link href="player/videojs/dist/video-js.min.css" rel="stylesheet">
+	<link href="player/videojs/dist/video-js-skin.min.css" rel="stylesheet">
+	<link href="player/videojs/dist/videojs-overlay.min.css" rel="stylesheet">
+	<link href="player/videojs/dist/videojs-license.min.css" rel="stylesheet">
 </head>
 <body>
-  <video
-    id="my-video"
-    class="video-js vjs-default-skin"
-    controls
-    preload="auto"
-    autoplay
-    data-setup='{}'>
-    <source src="http://moo7hd.myddns.me:9192/r3-sn-5fo-c37ed16.googleuservideo.com/fifa55u_x1/monomax1_480p/chunks.m3u8nimblesessionid20967917wmsAuthSignc2VydmVyX3RpbWU9OC8xNC8yMDI1IDQ6MTU6MDIgUE0maGFzaF92YWx1ZT1RMjNBYmJxTU1Ua1VLVTRONXJmNUJBPT0mdmFsaWRtaW51dGVzPTEmc3RybV9sZW49MjQmaWQ9Ymdocjc3Nj/video.m3u8
+<div style="position:absolute;top:0;right:0;bottom:0;left:0">
+	<video id="player" class="vjs-public video-js" controls playsinline></video>
+</div>
+<script src="player/videojs/dist/video.min.js"></script>
+<script src="player/videojs/dist/videojs-overlay.min.js"></script>
+<script src="player/videojs/dist/videojs-license.min.js"></script>
+<script>
+	function getQueryParam(key, defaultValue) {
+		var query = window.location.search.substring(1);
+		var vars = query.split("&");
+		for(var i = 0; i < vars.length; i++) {
+			var pair = vars[i].split("=");
+			if(pair[0] == key) {
+				return pair[1];
+			}
+		}
+		return defaultValue;
+	}
 
-      " type="application/x-mpegURL">
-    <p class="vjs-no-js">
-      กรุณาเปิดใช้งาน JavaScript และใช้เบราว์เซอร์ที่รองรับ HTML5 video
-    </p>
-  </video>
+	function convertBoolParam(key, defaultValue) {
+		var val = getQueryParam(key, defaultValue);
+		return val === true || val === "true" || val === "1" || val === "yes" || val === "on";
+	}
+
+	function convertColorParam(parameter, defaultColor) {
+		var re = new RegExp("^#([0-9a-f]{3}|[0-9a-f]{6})$");
+		var c = getQueryParam(parameter, defaultColor);
+		// decode color as # has to be represented by %23
+		var c = decodeURIComponent(c);
+		// if color was given without leading #, prepend it
+		if (!String(c).startsWith("#")) c = "#" + c;
+
+		if (re.test(c)) {
+			return c;
+		} else {
+			return defaultColor;
+		}
+	}
+
+	var autoplay = convertBoolParam("autoplay", playerConfig.autoplay);
+	var mute = convertBoolParam("mute", playerConfig.mute);
+	var statistics = convertBoolParam("stats", playerConfig.statistics);
+	var color = convertColorParam("color", playerConfig.color.buttons);
+
+	var config = {
+		controls: true,
+		poster: playerConfig.poster + '?t=' + String(new Date().getTime()),
+		autoplay: autoplay ? 'muted' : false,
+		muted: mute,
+		liveui: true,
+		responsive: true,
+		fluid: true,
+		sources: [{ src: window.location.origin + '/' + playerConfig.source, type: 'application/x-mpegURL' }],
+	};
+
+	if (playerConfig.chromecast) {
+		config.techOrder = ["chromecast", "html5"];
+		config.plugins.chromecast = {
+			receiverApplicationId: 'CC1AD845'
+		};
+	}
+
+	if (playerConfig.airplay) {
+		config.plugins.airPlay = {};
+	}
+
+	var player = videojs('player', config);
+	player.ready(function() {
+		if(playerConfig.logo.image.length != 0) {
+			var overlay = null;
+
+			var imgTag = new Image();
+			imgTag.onLoad = function () {
+				imgTag.setAttribute('width', this.width);
+				imgTag.setAttribute('height'.this.height);
+			};
+			imgTag.src = playerConfig.logo.image + '?' + Math.random();
+
+			if (playerConfig.logo.link.length !== 0) {
+				var aTag = document.createElement('a');
+				aTag.setAttribute('href', playerConfig.logo.link);
+				aTag.setAttribute('target', '_blank');
+				aTag.appendChild(imgTag);
+				overlay = aTag.outerHTML;
+			} else {
+				overlay = imgTag.outerHTML;
+			}
+
+			player.overlay({
+				align: playerConfig.logo.position,
+				overlays: [
+					{
+						showBackground: false,
+						content: overlay,
+						start: 'playing',
+						end: 'pause',
+					},
+				],
+			});
+
+			player.license(playerConfig.license);
+		}
+
+		if (autoplay === true) {
+			// https://videojs.com/blog/autoplay-best-practices-with-video-js/
+			player.play();
+		}
+	});
+</script>
 </body>
 </html>
